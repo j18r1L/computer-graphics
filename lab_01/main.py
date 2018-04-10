@@ -10,8 +10,9 @@ root.geometry('1250x700') #960
 canv = Canvas(bg='white')
 canv.pack(fill = BOTH, expand = 1)
 def main():
-    global point_list, k, used_colors
+    global point_list, k, used_colors, k_zoom
     k = 0 #Номер точки
+    k_zoom = 1
     point_list = []
     used_colors = []
     route()
@@ -24,6 +25,7 @@ def main():
 def route():
     canv.create_line(480, 700, 480, 0, width = 1, fill = 'red', arrow = LAST)
     canv.create_line(0, 350, 960, 350, width = 1, fill = 'red', arrow = LAST)
+    '''
     for i in range (480, 960, 100):
         canv.create_text(i, 360, text = math.fabs((480 - i) / 100))
         canv.create_oval(i - 1, 349, i + 1, 351, width = 2)
@@ -36,15 +38,6 @@ def route():
     for i in range (350, 0, -100):
         canv.create_text(495, i, text = (350 - i) / 100)
         canv.create_oval(479, i - 1, 481, i + 1, width = 2)
-    '''
-    canv.create_line(10, 700, 10, 0, width = 1, fill = 'red', arrow = LAST)
-    canv.create_line(0, 690, 960, 690, width = 1, fill = 'red', arrow = LAST)
-    for i in range(690, 0, -100):
-    	canv.create_text(27, i, text = (690 - i) / 100)
-    	canv.create_oval(9, i - 1, 11, i + 1)
-    for i in range(10, 960, 100):
-    	canv.create_text(i, 680, text = (i - 10) / 100)
-    	canv.create_oval(i - 1, 691, i + 1, 689)
     '''
     #Боковое меню
     canv.create_line(960, 0, 960, 700, width = 2)
@@ -60,25 +53,27 @@ def route():
     canv.create_text(973, 114, text = "№: ")
 
 def draw_points():
-	global point_list
-	for i in range (len(point_list)):
-		canv.create_oval(point_list[i][0] - 1, point_list[i][1] - 1, point_list[i][0] + 1, point_list[i][1] + 1,  width = 2)
-		canv.create_text(point_list[i][0] + 50, point_list[i][1] - 10, font = '5', text = (i, '(', (point_list[i][0] - 480) / 100, ',', (690 - point_list[i][1] - 340) / 100, ')'))
+    global point_list, k_zoom
+    for i in range (len(point_list)):
+        x = k_zoom * point_list[i][0] + (1 - k_zoom) * 480
+        y = k_zoom * point_list[i][1] + (1 - k_zoom) * 350
+        canv.create_oval(x - 1, y - 1, x + 1, y + 1,  width = 2)
+        canv.create_text(x + 50, y - 10, font = '5', text = (i, '(', (point_list[i][0] - 480) / 100, ',', (690 - point_list[i][1] - 340) / 100, ')'))
 
 def points_change(x, y, flag_x, flag_y):
-	global point_list
-	x = -x
-	#y += 10
-	x = math.fabs(x - 480)
-	y = math.fabs(y - 350)
-	if (flag_x == True):
-		x = -x
-	if (flag_y == True):
-		y = -y
-	return x, y
+    global point_list
+    x = -x
+    #y += 10
+    x = math.fabs(x - 480)
+    y = math.fabs(y - 350)
+    if (flag_x == True):
+        x = -x
+    if (flag_y == True):
+        y = -y
+    return x, y
 
 def triangle(x1, y1, x2, y2, x3, y3, color):
-    global used_colors
+    global used_colors, k_zoom
     #colors = ["#FF8C69", "#C96D4F", "#CEA192", "black", "dark slate gray", "dim gray", "midnight blue", "medium blue", "royal blue", "dark green", "pale green", "dark khaki", "gold", "yellow", "indian red", "saddle brown", "chocolate", "firebrick", "orange red"]
     colors = ["red", "deeppink", "darkblue", "darkgreen", "lightskyblue", "yellow", "orange"]
     if (len(used_colors) == 6):
@@ -88,12 +83,20 @@ def triangle(x1, y1, x2, y2, x3, y3, color):
         i = randint(0, 6)
     if (color != -1):
         i = color
+
+    x1 = k_zoom * x1 + (1 - k_zoom) * 480
+    y1 = k_zoom * y1 + (1 - k_zoom) * 350
+    x2 = k_zoom * x2 + (1 - k_zoom) * 480
+    y2 = k_zoom * y2 + (1 - k_zoom) * 350
+    x3 = k_zoom * x3 + (1 - k_zoom) * 480
+    y3 = k_zoom * y3 + (1 - k_zoom) * 350
+
     canv.create_line((x1, y1, x2, y2), fill = colors[i])
     canv.create_line((x2, y2, x3, y3), fill = colors[i])
     canv.create_line((x3, y3, x1, y1), fill = colors[i])
     used_colors.append(colors[i])
     return i
-	
+    
 def add_button():
     #Кнопка добавление 
     global add_x, add_y
@@ -119,9 +122,9 @@ def get_A(root):
     flag_x = False
     flag_y = False
     if (x <= -4.9):
-    	flag_x = True
+        flag_x = True
     if (y >=  3.6):
-    	flag_y = True
+        flag_y = True
     x *= 100
     y *= 100
     x, y = points_change(x, y, flag_x, flag_y)
@@ -160,9 +163,15 @@ def get_E(root):
     n = int(n)
     x = float(x)
     y = float(y)
+    flag_x = False
+    flag_y = False
+    if (x <= -4.9):
+        flag_x = True
+    if (y >=  3.6):
+        flag_y = True
     x *= 100
     y *= 100
-    x, y = points_change(x, y)
+    x, y = points_change(x, y, flag_x, flag_y)
     point_list[n][0] = x
     point_list[n][1] = y
     canv.delete("all")
@@ -234,10 +243,10 @@ def find_triangle():
                             s = array(a, b, c)
                             needed_points.append([angle, s, i, j, o])
                             angle_m = angle
+                            k_zoom = zoom(x1, y1, x2, y2, x3, y3)
                             canv.delete("all")
                             draw_points()
                             route()
-                            zoom(x1, y1, x2, y2, x3, y3)
                             color = triangle(x1, y1, x2, y2, x3, y3, -1)
                             triangle(x2_g, y2_g, x_m_c, y_m_c, x_b_b, y_b_b, color)
                             flag = True
@@ -250,7 +259,7 @@ def find_triangle():
                             if add_flag != True:
                                 needed_points.append([angle, s, i, j, o])
                                 color = triangle(x1, y1, x2, y2, x3, y3, -1)
-                                triangle(x2_g, y2_g, x_m_c, y_m_c, x_b_b, y_b_b, color) 	
+                                triangle(x2_g, y2_g, x_m_c, y_m_c, x_b_b, y_b_b, color)     
     if (flag == False) and (len(point_list) >= 3):
         for i in range(len(point_list) - 1):
             canv.create_line(point_list[i][0], point_list[i][1], point_list[i + 1][0], point_list[i + 1][1])
@@ -298,7 +307,7 @@ def min_angle(x1, y1, x2, y2, x3, y3):
     x_m_b = (x2 + x3) / 2
     y_m_b = (y2 + y3) / 2
     #canv.create_oval(x_m_b - 1, y_m_b - 1, x_m_b + 1, y_m_b + 1,  width = 2)
-	
+    
     x_m_c = (x3 + x1) / 2
     y_m_c = (y3 + y1) / 2
     #canv.create_oval(x_m_c - 1, y_m_c - 1, x_m_c + 1, y_m_c + 1,  width = 2)
@@ -316,14 +325,38 @@ def min_angle(x1, y1, x2, y2, x3, y3):
     return angle, x2, y2, x_m_c, y_m_c, x_b_b, y_b_b
 
 def zoom(x1, y1, x2, y2, x3, y3):
-	print(x1, y1, x2, y2, x3, y3)
-	k_zoom = 1
-	while (0 < x1 < 960) and (0 < x2 < 960) and (0 < x3 < 960) and (0 < y1 < 700) and (0 < y2 < 700) and (0 < y3 < 700):
-            figures[i][0] = x_k_zoom * figures[i][0] + (1 - x_k_zoom) * x_c_z
-			x1 = k_zoom * x1 + (1 - k_zoom) * 
-            k_zoom += 0.1
+    global k_zoom
+    i = 0
+    x1k = x1
+    x2k = x2
+    x3k = x3
+    y1k = y1
+    y2k = y2
+    y3k = y3
+    while (x1 < 10 or x1 > 950) or (x2 < 10 or x2 > 950) or (x3 < 10 or x3 > 950) or (y1 < 10 or y1 > 690) or (y2 < 10 or y2 > 690) or (y3 < 10 or y3 > 690):
+        x1 = k_zoom * x1 + (1 - k_zoom) * 480
+        y1 = k_zoom * y1 + (1 - k_zoom) * 350
+        x2 = k_zoom * x2 + (1 - k_zoom) * 480
+        y2 = k_zoom * y2 + (1 - k_zoom) * 350
+        x3 = k_zoom * x3 + (1 - k_zoom) * 480
+        y3 = k_zoom * y3 + (1 - k_zoom) * 350
+        if (x1 > 10 and x1 < 950) and (x2 > 10 and x2 < 950) and (x3 > 10 and x3 < 950) and (y1 > 10 and y1 < 690) and (y2 > 10 and y2 < 690) and (y3 > 10 and y3 < 690):
+            return k_zoom
+        else:
+            x1 = x1k
+            x2 = x2k
+            x3 = x3k
+            y1 = y1k
+            y2 = y2k
+            y3 = y3k
+            i += 0.01
+            k_zoom = 1
+            k_zoom -= i
+            
+            
+
 def printf(x1, y1, x2, y2, x3, y3, angle, s):
-	print('Треугольник с точками:\nx1: ', (x1 - 480) / 100, "\ny1: ", (690 - y1 - 340) / 100, "\nx2: ", (x2 - 480) / 100, "\ny2: ", (690 - y2 - 340) / 100, "\nx3: ", (x3 - 480) / 100, "\ny3: ", (690 - y3 - 340) / 100, "\nИмеет наименьший угол между биссектрисой и медианой: ", angle,"\nЕго площадь равняется: ", s)
+    print('Треугольник с точками:\nx1: ', (x1 - 480) / 100, "\ny1: ", (690 - y1 - 340) / 100, "\nx2: ", (x2 - 480) / 100, "\ny2: ", (690 - y2 - 340) / 100, "\nx3: ", (x3 - 480) / 100, "\ny3: ", (690 - y3 - 340) / 100, "\nИмеет наименьший угол между биссектрисой и медианой: ", angle,"\nЕго площадь равняется: ", s)
 
 if __name__ == '__main__':
     main()
