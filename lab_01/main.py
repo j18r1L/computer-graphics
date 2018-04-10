@@ -1,0 +1,331 @@
+from tkinter import *
+import math
+from random import randint
+
+#x = x + 10
+#y = y - 10
+
+root = Tk()
+root.geometry('1250x700') #960
+canv = Canvas(bg='white')
+canv.pack(fill = BOTH, expand = 1)
+def main():
+    global point_list, k, used_colors
+    k = 0 #Номер точки
+    point_list = []
+    used_colors = []
+    route()
+    add_button()
+    edit_button()
+    delete_button()
+    delete_all_button()
+    find_triangle()
+
+def route():
+    canv.create_line(480, 700, 480, 0, width = 1, fill = 'red', arrow = LAST)
+    canv.create_line(0, 350, 960, 350, width = 1, fill = 'red', arrow = LAST)
+    for i in range (480, 960, 100):
+        canv.create_text(i, 360, text = math.fabs((480 - i) / 100))
+        canv.create_oval(i - 1, 349, i + 1, 351, width = 2)
+    for i in range (480, 0, -100):
+        canv.create_text(i, 360, text = -(480 - i) / 100)
+        canv.create_oval(i - 1, 349, i + 1, 351, width = 2)
+    for i in range (350, 700, 100):
+        canv.create_text(495, i, text = (350 - i) / 100)
+        canv.create_oval(479, i - 1, 481, i + 1, width = 2)
+    for i in range (350, 0, -100):
+        canv.create_text(495, i, text = (350 - i) / 100)
+        canv.create_oval(479, i - 1, 481, i + 1, width = 2)
+    '''
+    canv.create_line(10, 700, 10, 0, width = 1, fill = 'red', arrow = LAST)
+    canv.create_line(0, 690, 960, 690, width = 1, fill = 'red', arrow = LAST)
+    for i in range(690, 0, -100):
+    	canv.create_text(27, i, text = (690 - i) / 100)
+    	canv.create_oval(9, i - 1, 11, i + 1)
+    for i in range(10, 960, 100):
+    	canv.create_text(i, 680, text = (i - 10) / 100)
+    	canv.create_oval(i - 1, 691, i + 1, 689)
+    '''
+    #Боковое меню
+    canv.create_line(960, 0, 960, 700, width = 2)
+    canv.create_line(960, 39, 1250, 39)
+    canv.create_line(960, 99, 1250, 99)
+    canv.create_line(960, 133, 1250, 133)
+    #Текст к кнопкам
+    canv.create_text(970, 22, text = 'x: ')
+    canv.create_text(1045, 22, text = 'y: ')
+    canv.create_text(973, 52, text = '№: ')
+    canv.create_text(1045, 52, text = 'x: ')
+    canv.create_text(1115, 52, text = 'y: ')
+    canv.create_text(973, 114, text = "№: ")
+
+def draw_points():
+	global point_list
+	for i in range (len(point_list)):
+		canv.create_oval(point_list[i][0] - 1, point_list[i][1] - 1, point_list[i][0] + 1, point_list[i][1] + 1,  width = 2)
+		canv.create_text(point_list[i][0] + 50, point_list[i][1] - 10, font = '5', text = (i, '(', (point_list[i][0] - 480) / 100, ',', (690 - point_list[i][1] - 340) / 100, ')'))
+
+def points_change(x, y, flag_x, flag_y):
+	global point_list
+	x = -x
+	#y += 10
+	x = math.fabs(x - 480)
+	y = math.fabs(y - 350)
+	if (flag_x == True):
+		x = -x
+	if (flag_y == True):
+		y = -y
+	return x, y
+
+def triangle(x1, y1, x2, y2, x3, y3, color):
+    global used_colors
+    #colors = ["#FF8C69", "#C96D4F", "#CEA192", "black", "dark slate gray", "dim gray", "midnight blue", "medium blue", "royal blue", "dark green", "pale green", "dark khaki", "gold", "yellow", "indian red", "saddle brown", "chocolate", "firebrick", "orange red"]
+    colors = ["red", "deeppink", "darkblue", "darkgreen", "lightskyblue", "yellow", "orange"]
+    if (len(used_colors) == 6):
+        used_colors = []
+    i = randint(0, 6)
+    while i in used_colors:
+        i = randint(0, 6)
+    if (color != -1):
+        i = color
+    canv.create_line((x1, y1, x2, y2), fill = colors[i])
+    canv.create_line((x2, y2, x3, y3), fill = colors[i])
+    canv.create_line((x3, y3, x1, y1), fill = colors[i])
+    used_colors.append(colors[i])
+    return i
+	
+def add_button():
+    #Кнопка добавление 
+    global add_x, add_y
+    add_x = Entry(root)
+    add_x.pack()
+    add_x.place(x = 980, y = 10, width = 50)
+    
+    add_y = Entry(root)
+    add_y.pack()
+    add_y.place(x = 1050, y = 10, width = 50)
+    
+    button_1 = Button(root,text=u"Добавить точку")
+    button_1.pack()
+    button_1.place(x = 1100, y = 10, width = 140)
+    button_1.bind("<Button-1>", get_A)
+
+def get_A(root):
+    global add_x, add_y, point_list, k
+    x = add_x.get()
+    y = add_y.get()
+    x = float(x)
+    y = float(y)
+    flag_x = False
+    flag_y = False
+    if (x <= -4.9):
+    	flag_x = True
+    if (y >=  3.6):
+    	flag_y = True
+    x *= 100
+    y *= 100
+    x, y = points_change(x, y, flag_x, flag_y)
+    point_list.append([x,y])
+    k += 1
+    canv.delete("all")
+    draw_points()
+    route()
+    find_triangle()
+
+def edit_button():
+    global edit_n, edit_x, edit_y
+    
+    edit_n = Entry(root)
+    edit_n.pack()
+    edit_n.place(x = 980, y = 40, width = 50)
+
+    edit_x = Entry(root)
+    edit_x.pack()
+    edit_x.place(x = 1050, y = 40, width = 50)
+    
+    edit_y = Entry(root)
+    edit_y.pack()
+    edit_y.place(x = 1120, y = 40, width = 50)
+
+    button_2 = Button(root,text=u"Изменить точку")
+    button_2.pack()
+    button_2.place(x = 1100, y = 67, width = 140)
+    button_2.bind("<Button-1>", get_E)
+
+def get_E(root):
+    global edit_n, edit_x, edit_y, point_list, k
+    n = edit_n.get()
+    x = edit_x.get()
+    y = edit_y.get()
+    n = int(n)
+    x = float(x)
+    y = float(y)
+    x *= 100
+    y *= 100
+    x, y = points_change(x, y)
+    point_list[n][0] = x
+    point_list[n][1] = y
+    canv.delete("all")
+    draw_points()
+    route()
+    find_triangle()
+
+def delete_button():
+    global delete_n
+    delete_n = Entry()
+    delete_n.pack()
+    delete_n.place(x = 980, y = 103, width = 50)
+
+    button_3 = Button(root, text = u"Удалить точку")
+    button_3.pack()
+    button_3.place(x = 1100, y = 103, width = 140)
+    button_3.bind("<Button-1>", get_D)
+
+def get_D(root):
+    global delete_n, point_list, k
+    n = delete_n.get()
+    n = int(n)
+    if (n >= k):
+        print("Такой точки не существует")
+        return -1
+    del point_list[n]
+    k -= 1
+    canv.delete("all")
+    draw_points()
+    route()
+    find_triangle()
+
+def delete_all_button():
+    button_4 = Button(root, text = u"Удалить все точки")
+    button_4.pack()
+    button_4.place(x = 1100, y = 135, width = 140)
+    button_4.bind("<Button-1>", get_DA)
+
+def get_DA(root):
+    global k, point_list
+    point_list = []
+    k = 0
+    canv.delete("all")
+    route()
+
+def find_triangle():
+    global k
+    kol_vo = 0
+    angle_m = 180
+    flag = False
+    add_flag = False
+    needed_points = []
+    for i in range(len(point_list)):
+        x1 = point_list[i][0]
+        y1 = point_list[i][1]
+        for j in range(len(point_list)):
+            x2 = point_list[j][0]
+            y2 = point_list[j][1]
+            for o in range(len(point_list)):
+                x3 = point_list[o][0]
+                y3 = point_list[o][1]
+                if i != j and i != o and j != o:
+                    #Проверка на существование треугольника
+                    a, b, c = find_sides(x1, y1, x2, y2, x3, y3)
+                    if a + b > c and a + c > b and b + c > a:
+                        angle, x2_g, y2_g, x_m_c, y_m_c, x_b_b, y_b_b = min_angle(x1, y1, x2, y2, x3, y3)               
+                        if (angle < angle_m):
+                            needed_points = []
+                            s = array(a, b, c)
+                            needed_points.append([angle, s, i, j, o])
+                            angle_m = angle
+                            canv.delete("all")
+                            draw_points()
+                            route()
+                            zoom(x1, y1, x2, y2, x3, y3)
+                            color = triangle(x1, y1, x2, y2, x3, y3, -1)
+                            triangle(x2_g, y2_g, x_m_c, y_m_c, x_b_b, y_b_b, color)
+                            flag = True
+                        elif (angle == angle_m):
+                            s = array(a, b, c)
+                            add_flag = False
+                            for y in range(len(needed_points)):
+                                if (i == needed_points[y][2] and j == needed_points[y][3] and o == needed_points[y][4]) or (i == needed_points[y][4] and j == needed_points[y][3] and o == needed_points[y][2]):
+                                    add_flag = True
+                            if add_flag != True:
+                                needed_points.append([angle, s, i, j, o])
+                                color = triangle(x1, y1, x2, y2, x3, y3, -1)
+                                triangle(x2_g, y2_g, x_m_c, y_m_c, x_b_b, y_b_b, color) 	
+    if (flag == False) and (len(point_list) >= 3):
+        for i in range(len(point_list) - 1):
+            canv.create_line(point_list[i][0], point_list[i][1], point_list[i + 1][0], point_list[i + 1][1])
+        print("Все варианты вырождены")
+    elif (flag == True) and (len(point_list) >= 3):
+        for i in range(len(needed_points)):
+            angle = needed_points[i][0]
+            s = needed_points[i][1]
+
+            x1 = point_list[needed_points[i][2]][0]
+            y1 = point_list[needed_points[i][2]][1]
+
+            x2 = point_list[needed_points[i][3]][0]
+            y2 = point_list[needed_points[i][3]][1]
+
+            x3 = point_list[needed_points[i][4]][0]
+            y3 = point_list[needed_points[i][4]][1]
+
+            n = len(needed_points)
+            printf(x1, y1, x2, y2, x3, y3, angle, s)
+            kol_vo += 1
+    print("Количество треугольников: ", kol_vo)
+    print("_______________________________________")
+
+def array(a, b, c):
+    p = (a + b + c) / 2
+    s = math.sqrt(p * (p - a) * (p - b) * (p - c))
+    s = round(s, 3)
+    return s
+
+def find_sides(x1, y1, x2, y2, x3, y3):
+    a = (math.sqrt(abs(pow((x2 - x1), 2) + pow((y2 - y1), 2)))) 
+    b = (math.sqrt(abs(pow((x3 - x2), 2) + pow((y3 - y2), 2)))) 
+    c = (math.sqrt(abs(pow((x1 - x3), 2) + pow((y1 - y3), 2))))
+    return a, b, c
+
+def min_angle(x1, y1, x2, y2, x3, y3):
+    a, b, c = find_sides(x1, y1, x2, y2, x3, y3)
+
+    #Находим координату медианы
+    x_m_a = (x1 + x2) / 2
+    y_m_a = (y1 + y2) / 2
+    #canv.create_oval(x_m_a - 1, y_m_a - 1, x_m_a + 1, y_m_a + 1,  width = 2)
+    
+    x_m_b = (x2 + x3) / 2
+    y_m_b = (y2 + y3) / 2
+    #canv.create_oval(x_m_b - 1, y_m_b - 1, x_m_b + 1, y_m_b + 1,  width = 2)
+	
+    x_m_c = (x3 + x1) / 2
+    y_m_c = (y3 + y1) / 2
+    #canv.create_oval(x_m_c - 1, y_m_c - 1, x_m_c + 1, y_m_c + 1,  width = 2)
+
+    #Находим координату биссектрисы
+    x_b_b = (x3 + (a / b) * x1) / (1 + (a / b))
+    y_b_b = (y3 + (a / b) * y1) / (1 + (a / b))
+    #canv.create_oval(x_b_b - 1, y_b_b - 1, x_b_b + 1, y_b_b + 1,  width = 10)
+
+    #Находим угол между биссектрисой и медианой
+    angle = (((x2 - x_m_c) ** 2) + ((y2 - y_m_c) ** 2) + ((x2 - x_b_b) ** 2) + ((y2 - y_b_b) ** 2) - ((x_m_c - x_b_b) ** 2) - ((y_m_c - y_b_b) ** 2)) / (2 * math.sqrt(((x2 - x_m_c) ** 2) + ((y2 - y_m_c) ** 2)) * math.sqrt(((x2 - x_b_b) ** 2) + ((y2 - y_b_b) ** 2)))
+    angle = math.acos(angle)
+    angle = round(angle * (180 / math.pi), 2)
+
+    return angle, x2, y2, x_m_c, y_m_c, x_b_b, y_b_b
+
+def zoom(x1, y1, x2, y2, x3, y3):
+	print(x1, y1, x2, y2, x3, y3)
+	k_zoom = 1
+	while (0 < x1 < 960) and (0 < x2 < 960) and (0 < x3 < 960) and (0 < y1 < 700) and (0 < y2 < 700) and (0 < y3 < 700):
+            figures[i][0] = x_k_zoom * figures[i][0] + (1 - x_k_zoom) * x_c_z
+			x1 = k_zoom * x1 + (1 - k_zoom) * 
+            k_zoom += 0.1
+def printf(x1, y1, x2, y2, x3, y3, angle, s):
+	print('Треугольник с точками:\nx1: ', (x1 - 480) / 100, "\ny1: ", (690 - y1 - 340) / 100, "\nx2: ", (x2 - 480) / 100, "\ny2: ", (690 - y2 - 340) / 100, "\nx3: ", (x3 - 480) / 100, "\ny3: ", (690 - y3 - 340) / 100, "\nИмеет наименьший угол между биссектрисой и медианой: ", angle,"\nЕго площадь равняется: ", s)
+
+if __name__ == '__main__':
+    main()
+
+root.mainloop()
