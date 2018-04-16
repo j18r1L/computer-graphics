@@ -128,7 +128,7 @@ def get_A(root):
     x *= 100
     y *= 100
     x, y = points_change(x, y, flag_x, flag_y)
-    point_list.append([x,y])
+    point_list.append([x,y, k])
     k += 1
     canv.delete("all")
     draw_points()
@@ -198,6 +198,8 @@ def get_D(root):
         print("Такой точки не существует")
         return -1
     del point_list[n]
+    for i in range(n, len(point_list)):
+        point_list[i][2] -= 1
     k -= 1
     canv.delete("all")
     draw_points()
@@ -227,12 +229,15 @@ def find_triangle():
     for i in range(len(point_list)):
         x1 = point_list[i][0]
         y1 = point_list[i][1]
+        n_1 = point_list[i][2]
         for j in range(len(point_list)):
             x2 = point_list[j][0]
             y2 = point_list[j][1]
+            n_2 = point_list[j][2]
             for o in range(len(point_list)):
                 x3 = point_list[o][0]
                 y3 = point_list[o][1]
+                n_3 = point_list[o][2]
                 if i != j and i != o and j != o:
                     #Проверка на существование треугольника
                     a, b, c = find_sides(x1, y1, x2, y2, x3, y3)
@@ -271,15 +276,17 @@ def find_triangle():
 
             x1 = point_list[needed_points[i][2]][0]
             y1 = point_list[needed_points[i][2]][1]
+            n_1 = point_list[needed_points[i][2]][2]
 
             x2 = point_list[needed_points[i][3]][0]
             y2 = point_list[needed_points[i][3]][1]
+            n_2 = point_list[needed_points[i][3]][2]
 
             x3 = point_list[needed_points[i][4]][0]
             y3 = point_list[needed_points[i][4]][1]
+            n_3 = point_list[needed_points[i][4]][2]
 
-            n = len(needed_points)
-            printf(x1, y1, x2, y2, x3, y3, angle, s)
+            printf(x1, y1, x2, y2, x3, y3, angle, s, n_1, n_2, n_3)
             kol_vo += 1
     print("Количество треугольников: ", kol_vo)
     print("_______________________________________")
@@ -333,14 +340,14 @@ def zoom(x1, y1, x2, y2, x3, y3):
     y1k = y1
     y2k = y2
     y3k = y3
-    while (x1 < 10 or x1 > 950) or (x2 < 10 or x2 > 950) or (x3 < 10 or x3 > 950) or (y1 < 10 or y1 > 690) or (y2 < 10 or y2 > 690) or (y3 < 10 or y3 > 690):
+    while (x1 < 30 or x1 > 930) or (x2 < 30 or x2 > 930) or (x3 < 30 or x3 > 930) or (y1 < 30 or y1 > 670) or (y2 < 30 or y2 > 670) or (y3 < 30 or y3 > 670):
         x1 = k_zoom * x1 + (1 - k_zoom) * 480
         y1 = k_zoom * y1 + (1 - k_zoom) * 350
         x2 = k_zoom * x2 + (1 - k_zoom) * 480
         y2 = k_zoom * y2 + (1 - k_zoom) * 350
         x3 = k_zoom * x3 + (1 - k_zoom) * 480
         y3 = k_zoom * y3 + (1 - k_zoom) * 350
-        if (x1 > 10 and x1 < 950) and (x2 > 10 and x2 < 950) and (x3 > 10 and x3 < 950) and (y1 > 10 and y1 < 690) and (y2 > 10 and y2 < 690) and (y3 > 10 and y3 < 690):
+        if (x1 > 30 and x1 < 930) and (x2 > 30 and x2 < 930) and (x3 > 30 and x3 < 930) and (y1 > 30 and y1 < 670) and (y2 > 30 and y2 < 670) and (y3 > 30 and y3 < 670):
             return k_zoom
         else:
             x1 = x1k
@@ -349,14 +356,14 @@ def zoom(x1, y1, x2, y2, x3, y3):
             y1 = y1k
             y2 = y2k
             y3 = y3k
-            i += 0.01
+            i += 0.005
             k_zoom = 1
             k_zoom -= i
             
             
 
-def printf(x1, y1, x2, y2, x3, y3, angle, s):
-    print('Треугольник с точками:\nx1: ', (x1 - 480) / 100, "\ny1: ", (690 - y1 - 340) / 100, "\nx2: ", (x2 - 480) / 100, "\ny2: ", (690 - y2 - 340) / 100, "\nx3: ", (x3 - 480) / 100, "\ny3: ", (690 - y3 - 340) / 100, "\nИмеет наименьший угол между биссектрисой и медианой: ", angle,"\nЕго площадь равняется: ", s)
+def printf(x1, y1, x2, y2, x3, y3, angle, s, n_1, n_2, n_3):
+    print('Треугольник с точками:', n_1, ',', n_2, ',', n_3, '\nx1: ', (x1 - 480) / 100, "\ny1: ", (690 - y1 - 340) / 100, "\nx2: ", (x2 - 480) / 100, "\ny2: ", (690 - y2 - 340) / 100, "\nx3: ", (x3 - 480) / 100, "\ny3: ", (690 - y3 - 340) / 100, "\nИмеет наименьший угол между биссектрисой и медианой: ", angle,"\nЕго площадь равняется: ", s)
 
 if __name__ == '__main__':
     main()
