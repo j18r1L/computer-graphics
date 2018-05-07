@@ -16,6 +16,7 @@ def main():
     color_lines_button()
     color_background_button()
     list()
+    #create_lab()
     list_change_button()
     route()
 
@@ -55,16 +56,16 @@ def get_AL(root):
     x2 = int(x2)
     y2 = int(y2)
     #point_list.append([x1, y1, x2, y2])
-    canv.delete("all")
-    route()
     if (method == "Станадртная библиотека"):
-        print(1)
+        canv.create_line(x1, y1, x2, y2)
     elif (method == "Алгоритм Брезенхема с целочисленными"):
         brez_int(x1, y1, x2, y2)
     elif (method == "Алгоритм цифрового дифференциального анализа"):
         CDA(x1, y1, x2, y2)    
     elif (method == "Алгоритм Брезенхема с устранением ступенчатости"):
     	brez_stup(x1, y1, x2, y2)
+    elif (method == "Алгоритм Брезенхема с вещественными"):
+        brez_float(x1, y1, x2, y2)
     #draw_points()
     
 
@@ -94,27 +95,64 @@ def get_AC(root):
     #point_list.append([radius, angle])
     #canv.delete("all")
     #draw_points()
-    route()
 
 def rotate(angle, r):
+
     x_c = 500
     y_c = 500
-    x1 = x_c + r
-    y1 = y_c + r
-    x2 = x_c - r
-    y2 = y_c - r
+    x1 = x_c - r 
+    y1 = y_c
+    x2 = x_c + r
+    y2 = 0
+    canv.create_line(x1 , y1, x2, y2)
+    x1c = x1
+    x2c = x2
+    y1c = y1
+    y2c = y2
+    for i in range(0, 360, 10):
+        angle_rotate = i * math.pi / 180
+        x_1 = x_c + (x1 - x_c) * math.cos(angle_rotate) + (y1 - y_c) * math.sin(angle_rotate)
+        y_1 = y_c - (x1 - x_c) * math.sin(angle_rotate) + (y1 - y_c) * math.cos(angle_rotate)
+        x_2 = x_c + (x2 - x_c) * math.cos(angle_rotate) + (y2 - y_c) * math.sin(angle_rotate)
+        y_2 =0
+        x1 = int(x_1)
+        y1 = int(y_1)
+        x2 = int(x_2)
+        y2 = int(x_2)
+        canv.create_line(x1, y1, x2, y2)
+        x1 = x1c
+        x2 = x2c
+        y1 = y1c
+        y2 = y2c
 
+def create_lab():
+    canv.create_line(300, 300, 250, 350)
+    canv.create_line(250, 350, 200, 300)
+    canv.create_line(200, 300, 250, 250)
+    canv.create_line(250, 250, 300, 300)
+    canv.create_line(300, 300, 350, 300)
+    canv.create_line(350, 300, 350, 100)
+    canv.create_line(350, 100, 300, 100)
+    canv.create_line(300, 100, 300, 300)
+    canv.create_line(350, 300, 400, 350)
+    canv.create_line(400, 350, 450, 300)
+    canv.create_line(450, 300, 400, 250)
+    canv.create_line(400, 250, 350, 300)
 
-    for i in range (360 / angle):
-        brez_int(x1, y1, x2, y2)
-        x_1 = x_c + (x1 - x_c) * cos(angle_rotate) + (y1 - y_c) * sin(angle_rotate)
-        y_1 = y_c - (x1 - x_c) * sin(angle_rotate) + (y1 - y_c) * cos(angle_rotate)
-        x_2 = x_c + (x2 - x_c) * cos(angle_rotate) + (y2 - y_c) * sin(angle_rotate)
-        y_2 = y_c - (x2 - x_c) * sin(angle_rotate) + (y2 - y_c) * cos(angle_rotate)
-        x1 = x_1
-        y1 = y_1
-        x2 = x_2
-        y2 = x_2
+    '''
+    for i in range (int(360 / angle)):
+        angle_rotate = i * math.pi / 180
+        #brez_int(x1, y1, x2, y2)
+        canv.create_line(x1, y1, x2, y2)
+        x_1 = x_c + (x1 - x_c) * math.cos(angle_rotate) + (y1 - y_c) * math.sin(angle_rotate)
+        y_1 = y_c - (x1 - x_c) * math.sin(angle_rotate) + (y1 - y_c) * math.cos(angle_rotate)
+        x_2 = x_c + (x2 - x_c) * math.cos(angle_rotate) + (y2 - y_c) * math.sin(angle_rotate)
+        y_2 = y_c - (x2 - x_c) * math.sin(angle_rotate) + (y2 - y_c) * math.cos(angle_rotate)
+        x1 = int(x_1)
+        y1 = int(y_1)
+        x2 = int(x_2)
+        y2 = int(x_2)
+    '''
 
 def color_lines_button():
     button_4 = Button(root, text = u"Изменить цвет линии")
@@ -161,6 +199,16 @@ def route():
     #Линии меню
     canv.create_line(1000, 207.5, 1200, 207.5)
     canv.create_line(1000, 309, 1200, 309)
+    #Линии
+    #canv.create_line(50, 0, 50, 700)
+    #canv.create_line(100, 0, 100, 700)
+    #canv.create_line(150, 0, 150, 700)
+    #canv.create_line(200, 0, 200, 700)
+
+    #canv.create_line(0, 200, 960, 200)
+    #canv.create_line(0, 50, 960, 50)
+    #canv.create_line(0, 100, 960, 100)
+    #canv.create_line(0, 150, 960, 150)
 
 def list_change_button():
     button_5 = Button(root, text = u"Изменить способ")
@@ -185,21 +233,42 @@ def list():
     listbox.insert(END, "Алгоритм цифрового дифференциального анализа")
 
 def brez_int(x1, y1, x2, y2):
-	x = x1
-	y = y1
-	dx = y2 - y1
-	dy = y2 - x1
-	e = 2 * dy * dx
-	for i in range(1, dx):
-		#возможно надо сюда пихать рисование
-		print(i)
-		while (e >= 0):
-			y = y + 1
-			e = e - 2 * dx
-		x = x + 1
-		e = e + 2 * dy
-		canv.create_line(x, y, x, y + 1)
-		canv.create_line(x, y + 1, x, y + 2, fill = "white")
+    dx = math.fabs(x2 - x1)
+    dy = math.fabs(y2 - y1)
+    error = 0
+    der = dy
+    y = y1
+    diry = y2 - y1
+    if (diry > 0):
+        diry = 1
+    elif (diry < 0):
+        diry = -1
+    for i in range (x1, x2):
+        canv.create_line(i, y, i, y + 1)
+        canv.create_line(i, y + 1, i, y + 2, fill = "white")
+        error += der
+        if (error * 2 >= dx):
+            y += diry
+            error -= dx
+
+def brez_float(x1, y1, x2, y2):
+    dx = math.fabs(x2 - x1)
+    dy = math.fabs(y2 - y1)
+    error = 0
+    der = dy / dx
+    y = y1
+    diry = y2 - y1
+    if (diry > 0):
+        diry = 1
+    elif (diry < 0):
+        diry = -1
+    for i in range(x1, x2):
+        canv.create_line(i, y, i, y + 1)
+        canv.create_line(i, y + 1, i, y + 2, fill = "white")
+        error += der
+        if (error >= 0.5):
+            y += diry
+            error -= 1
 
 def CDA(x1, y1, x2, y2):
     e = x2 / y2
@@ -218,7 +287,7 @@ def CDA(x1, y1, x2, y2):
             e += d_a
 
 def brez_stup(x1, y1, x2, y2):
-    I = 10
+    I = 1
     x = x1
     y = y1
     dx = x2 - x1
@@ -237,10 +306,6 @@ def brez_stup(x1, y1, x2, y2):
             y += 1
             e -= m
         canv.create_line(x, y, x, y + 1)
-        
-
-
-
         canv.create_line(x, y + 1, x, y + 2, fill = "white")
 
 #def brez_float(x1, y1, x2, y2):
