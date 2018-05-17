@@ -11,7 +11,7 @@ canv.pack()
 
 def main():
     global point_list, img, color_lines
-    color_lines = ["1", "black"]
+    color_lines = ["1", "#000000"]
     img = PhotoImage(width = 1250, height = 700)
     canv.create_image((1250//2, 700//2), image=img, state="normal")
     point_list = []
@@ -437,7 +437,10 @@ def brez_stup(x1, y1, x2, y2):
         i = i + 1
 
 def change_lightness(color, lvl, max_levels):
+    if (color == 'black'):
+        color = '#000000'
     rrggbb = color[1:3], color[3:5], color[5:7]
+    print(rrggbb)
     rrggbb = [int(i, 16) for i in rrggbb]
     step = int(255/max_levels-1)
     for i in range(3):
