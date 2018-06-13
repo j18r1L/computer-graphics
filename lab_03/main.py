@@ -443,7 +443,6 @@ def change_lightness(color, lvl, max_levels):
     if (color == 'black'):
         color = '#000000'
     rrggbb = color[1:3], color[3:5], color[5:7]
-    #print(rrggbb)
     rrggbb = [int(i, 16) for i in rrggbb]
     step = int(255/max_levels-1)
     for i in range(3):
@@ -451,95 +450,13 @@ def change_lightness(color, lvl, max_levels):
         if rrggbb[i] > 255: rrggbb[i] = 255
         rrggbb[i] = hex(rrggbb[i])[2:]
     return "#" + "".join([str(i) if len(i)==2 else "0"+str(i) for i in rrggbb])
-######
+
 def sign(x):
     if x == 0:
         return 0
     else:
         return x/math.fabs(x)
 
-'''
-def CDA(x1, y1, x2, y2):
-    global img, color_lines
-    e = x2 / y2
-    d_a = x2 / y2
-    x = x1
-    y = y1
-    while (x < x2):
-        canv.create_image((1250//2, 700//2), image=img, state="normal")
-        img.put(color_lines[1], (x, y))
-        if (e > 0.5):
-            x += 1
-            y += 1
-            e += d_a - 1
-        else:
-            x += 1
-            e += d_a
-def brez_stup(x1, y1, x2, y2):
-    global img, color_lines
-    I = 1
-    x = x1
-    y = y1
-    dx = x2 - x1
-    dy = y2 - y1
-    m = (I * dy) / dx
-    w = I - m
-    e = 0.5
-    canv.create_image((1250//2, 700//2), image=img, state="normal")
-    img.put(color_lines[1], (x, y))
-    while (x < x2):
-        if (e < w):
-            x += 1
-            e += m
-        else:
-            x += 1
-            y += 1
-            e -= m
-        canv.create_image((1250//2, 700//2), image=img, state="normal")
-        img.put(color_lines[1], (x, y))
-def brez_int(x1, y1, x2, y2):
-    global img, color_lines
-    dx = math.fabs(x2 - x1)
-    dy = math.fabs(y2 - y1)
-    error = 0
-    der = dy
-    y = y1
-    diry = y2 - y1
-    if (diry > 0):
-        diry = 1
-    elif (diry < 0):
-        diry = -1
-    canv.delete("all")
-    route()
-    for i in range (x1, x2):
-        #canv.create_line(i, y, i, y + 1)
-        #canv.create_line(i, y + 1, i, y + 2, fill = "white")
-        canv.create_image((1250//2, 700//2), image=img, state="normal")
-        img.put(color_lines[1], (i, y))
-        error += der
-        if (error * 2 >= dx):
-            y += diry
-            error -= dx
-def brez_float(x1, y1, x2, y2):
-    global img, color_lines
-    dx = math.fabs(x2 - x1)
-    dy = math.fabs(y2 - y1)
-    error = 0
-    der = dy / dx
-    y = y1
-    diry = y2 - y1
-    if (diry > 0):
-        diry = 1
-    elif (diry < 0):
-        diry = -1
-    for i in range(x1, x2):
-        canv.create_image((1250//2, 700//2), image=img, state="normal")
-        img.put(color_lines[1], (i, y))
-        error += der
-        if (error >= 0.5):
-            y += diry
-            error -= 1
-'''
 
 if __name__ == '__main__':
     main()
