@@ -151,7 +151,12 @@ def get_P(root):
     lines_check = sort()
     for i in range(len(lines_check)):
         for j in range(0, len(lines_check[i]) - 1, 2):
-            canv.after(100, lambda: canv.create_line(lines_check[i][j][0], lines_check[i][j][1], lines_check[i][j + 1][0], lines_check[i][j][1]))
+            #canv.after(1000, line(lines_check[i][j][0], lines_check[i][j][1], lines_check[i][j + 1][0], lines_check[i][j][1]))
+            canv.create_line(lines_check[i][j][0], lines_check[i][j][1], lines_check[i][j + 1][0], lines_check[i][j][1])
+            #canv.update_idletasks()
+
+def line(x1, y1, x2, y2):
+    canv.create_line(x1, y1, x2, y2)
 
 
 def get_PD(root):
