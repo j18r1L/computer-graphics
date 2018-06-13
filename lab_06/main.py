@@ -141,7 +141,7 @@ def paint_delay_button():
     button_4 = Button(root, text = u"Закрасить с задержкой")
     button_4.pack()
     button_4.place(x = 980, y = 150, width = 140)
-    button_4.bind("<Button-1>", get_PD)
+    button_4.bind("<Button-1>", get_P)
 
 def get_P(root):
     global lines_check, edges, exterm, pix, pix_array
@@ -185,6 +185,7 @@ def find_end(x_s, x_e):
 
         if (point not in points_array) and (point not in lines_check) and (point[0] > x_s[0]) and (point[0] < x_e[0]):
             #print("kaka")
+            print("Выше: ", point)
             pix = point
             pix_array.append(pix)
             break
@@ -193,6 +194,7 @@ def find_end(x_s, x_e):
         point = [i, x_s[1] - 1]
         if (point not in points_array) and (point not in lines_check) and (point[0] > x_s[0]) and (point[0] < x_e[0]):
             #print("Yatyt")
+            print("Ниже: ", point)
             pix = point
             pix_array.append(pix)
             break
@@ -233,18 +235,40 @@ def full():
 
 
 def get_PD(root):
-    global lines_check, img
-    lines_check = sort()
-    for i in range(len(lines_check)):
-        for j in range(0, len(lines_check[i]) - 1, 2):
-            for k in range(lines_check[i][j][0], lines_check[i][j + 1][0]):
-
-                start = lines_check[i][j][0]
-                end = lines_check[i][j + 1][0]
-                if (k > start and k < end):
-                    canv.after(100, lambda: canv.create_image((1250//2, 700//2), image=img, state="normal"))
-                    img.put("black", (k, lines_check[i][j][1]))
-                    root.update()
+    global lines_check, points_array, pix_array
+    pix = pix_array[0]
+    pix_array.pop(0)
+    #print(pix_array)
+    flag = False
+    point = pix
+    i1 = 0
+    x_s = -1
+    x_e = -1
+    for i in range(0, 700):
+        if (flag == False):
+            points_array.append(point)
+            if (point in lines_check):
+                canv.create_line(pix[0], pix[1], point[0], point[1])
+                root.update()
+                update_clock(0)
+                x_s = point
+                point = pix
+                i1 = 0
+                flag = True
+            point = [pix[0] - i1, pix[1]]
+            i1 += 1
+        else:
+            if (point in lines_check):
+                canv.create_line(pix[0], pix[1], point[0], point[1])
+                root.update()
+                update_clock(0)
+                x_e = point
+                point = pix
+                break
+            point = [pix[0] + i1, pix[1]]
+            points_array.append(point)
+            i1 += 1
+    return x_s, x_e
 
 def sort():
     global lines_check
@@ -313,6 +337,11 @@ def get_E(root):
     y_start = False
     x_end = False
     y_end = False
+
+def update_clock(i):
+    i += 1
+    if i < 2:
+        root.after(1, update_clock(i))
 
 if __name__ == '__main__':
     main()
