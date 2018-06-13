@@ -1,5 +1,7 @@
 from tkinter import *
 import math
+import time
+
 
 
 root = Tk()
@@ -9,17 +11,25 @@ canv.pack()
 
 
 def main():
-    global point_list, img, x_start, y_start
+    global point_list, img, x_start, y_start, lines_check, n, y_pred, edges, maxi, mini, exterm
+    exterm = []
+    edges = []
+    n = 0
     x_start = False
     y_start = False
     img = PhotoImage(width = 1250, height = 700)
     canv.create_image((1250//2, 700//2), image=img, state="normal")
     point_list = []
+    maxi = []
+    mini = []
+    lines_check = []
+    y_pred = -1
     add_line_button()
     route()
     delete_all_button()
     end_button()
-
+    paint_button()
+    paint_delay_button()
 
 def add_line_button():
     global add_x, add_y
@@ -38,7 +48,7 @@ def add_line_button():
     canv.bind('<1>', get_C)
 
 def get_C(root):
-    global point_list, x_start, y_start, x_end, y_end
+    global point_list, x_start, y_start, x_end, y_end, n
     x = root.x
     y = root.y
     if (x_start == False) and (y_start == False):
@@ -52,33 +62,31 @@ def get_C(root):
         print('| {:2.0f} | {:7.0f} | {:7.0f} |'.format(i, point_list[i][0], point_list[i][1]))
     print('_______________________________\n')
     canv.create_line(x_start, y_start, x, y)
+    #CDA(x_start, y_start, x, y)
     x_start = x
     y_start = y
-    lines_check()
-
-
-
 
 def get_AL(root):
-    global add_x, add_y, point_list, x_start, y_start, x_end, y_end
+    global add_x, add_y, point_list, x_start, y_start, x_end, y_end, n
     x = add_x.get()
     y = add_y.get()
     x = int(x)
     y = int(y)
     if (x_start == False) and (y_start == False):
-    	x_start = x
-    	y_start = y
-    	x_end = x
-    	y_end = y
+        x_start = x
+        y_start = y
+        x_end = x
+        y_end = y
     point_list.append([x, y])
+    
     print('| {:2.0s} | {:7s} | {:7.2s} |'.format('N', 'X', 'Y'))
     for i in range(len(point_list)):
         print('| {:2.0f} | {:7.0f} | {:7.0f} |'.format(i, point_list[i][0], point_list[i][1]))
     print('_______________________________\n')
     canv.create_line(x_start, y_start, x, y)
+    #CDA(x_start, y_start, x, y)
     x_start = x
     y_start = y
-    lines_check()
 
 def delete_all_button():
     button_2 = Button(root, text = u"Удалить все точки")
@@ -87,15 +95,131 @@ def delete_all_button():
     button_2.bind("<Button-1>", get_DA)
 
 def get_DA(root):
-    global point_list, x_start, y_start, x_end, y_end
+    global point_list, x_start, y_start, x_end, y_end, lines_check, n, edges, exterm
+    maxi = []
+    mini = []
+    edges = []
+    exterm = []
+    n = 0
     point_list = []
+    lines_check = []
     x_end = False
     y_end = False
+    y_pred = -1
     x_start = False
     y_start = False
     canv.delete("all")
     delete_img()
     route()
+
+def paint_button():
+    button_3 = Button(root, text = u"Закрасить")
+    button_3.pack()
+    button_3.place(x = 980, y = 120, width = 140)
+    button_3.bind("<Button-1>", get_P)
+
+def paint_delay_button():
+    button_4 = Button(root, text = u"Закрасить с задержкой")
+    button_4.pack()
+    button_4.place(x = 980, y = 150, width = 140)
+    button_4.bind("<Button-1>", get_PD)
+
+def get_P(root):
+    global lines_check, edges, exterm
+    for i in range(len(edges)):
+        for j in range(len(edges[i]) - 1, -1, -1):
+            if (j + 1 > len(edges[i]) - 1):
+                y0 = edges[i][0][1]
+                x0 = edges[i][0][0]
+            else:
+                y0 = edges[i][j + 1][1]
+                x0 = edges[i][j + 1][0]
+            fill_exterm(edges[i][j][0], edges[i][j][1], edges[i][j - 1][0], edges[i][j - 1][1], y0)
+    for i in range(len(edges)):
+        for j in range(len(edges[i]) - 1, -1, -1):
+            x1 = edges[i][j][0]
+            y1 = edges[i][j][1]
+            x2 = edges[i][j - 1][0]
+            y2 = edges[i][j - 1][1]
+            if (j + 1 > len(edges[i]) - 1):
+                y0 = edges[i][0][1]
+                x0 = edges[i][0][0]
+            else:
+                y0 = edges[i][j + 1][1]
+                x0 = edges[i][j + 1][0]
+            CDA(x1, y1, x2, y2, y0)
+    lines_check = sort()
+    for i in range(len(lines_check)):
+        for j in range(0, len(lines_check[i]) - 1, 2):
+            canv.after(100, lambda: canv.create_line(lines_check[i][j][0], lines_check[i][j][1], lines_check[i][j + 1][0], lines_check[i][j][1]))
+
+
+def get_PD(root):
+    global lines_check, img
+    lines_check = sort()
+    for i in range(len(lines_check)):
+        for j in range(0, len(lines_check[i]) - 1, 2):
+            for k in range(lines_check[i][j][0], lines_check[i][j + 1][0]):
+
+                start = lines_check[i][j][0]
+                end = lines_check[i][j + 1][0]
+                if (k > start and k < end):
+                    canv.after(100, lambda: canv.create_image((1250//2, 700//2), image=img, state="normal"))
+                    img.put("black", (k, lines_check[i][j][1]))
+                    root.update()
+
+def sort():
+    global lines_check
+    array = []
+    lines_sort = []
+
+    #Сортировка по y
+    for i in range(len(lines_check) - 1):
+        for j in range(len(lines_check) - 1):
+            if (lines_check[j][1] > lines_check[j + 1][1]):
+                lines_check[j], lines_check[j + 1] = lines_check[j + 1], lines_check[j]
+
+    #Создание трехмерного массива точек
+    for i in range(len(lines_check) - 1):
+        if (lines_check[i][1] == lines_check[i + 1][1]):
+            array.append(lines_check[i])
+        else: 
+            array.append(lines_check[i])
+            lines_sort.append(array)
+            array = []
+    #Сортировка по x
+    for i in range(len(lines_sort)):
+        for j in range(len(lines_sort[i]) - 1):
+            for k in range(len(lines_sort[i]) - 1):
+                if (lines_sort[i][k][0] > lines_sort[i][k + 1][0]):
+                    lines_sort[i][k + 1][0], lines_sort[i][k][0] = lines_sort[i][k][0], lines_sort[i][k + 1][0]
+    return lines_sort
+
+def fill_exterm(x1, y1, x2, y2, y0):
+    global exterm
+    if (y0 < y1 and y2 < y1) or (y0 > y1 and y2 > y1):
+        exterm.append([x1, y1])
+
+def CDA(x1, y1, x2, y2, y0): # rely on DDA
+    global lines_check, exterm
+    if (y1 == y2):
+        return -1
+    if (y1 > y2):
+        y1, y2 = y2, y1
+        x1, x2 = x2, x1
+
+    point = [x2, y2]
+    if (point in exterm):
+            lines_check.append([x2, y2])
+        
+    y = y1 + 1
+    dx = (x2 - x1) / (y2 - y1)
+    x = x1 + dx * (y - y1)
+
+    while (y <= y2):
+        lines_check.append([int(round(x)), y])
+        y += 1
+        x += dx 
 
 def delete_img():
     global img
@@ -114,62 +238,18 @@ def end_button():
     button_3.bind("<Button-1>", get_E)
 
 def get_E(root):
-    global x_start, y_start, x_end, y_end
+    global x_start, y_start, x_end, y_end, point_list
     canv.create_line(x_start, y_start, x_end, y_end)
+    #CDA(x_start, y_start, x_end, y_end)
+    edges.append(point_list)
+    point_list = []
     x_start = False
     y_start = False
     x_end = False
     y_end = False
 
-def lines_check():
-    global point_list, cross_list
-    y_max = point_list[0][1]
-    y_min = point_list[0][1]
-    cross_list = []
-    for i in range(len(point_list)):
-        if (point_list[i][1] > y_max):
-            y_max = point_list[i][1]
-        elif (point_list[i][1] < y_min):
-            y_min = point_list[i][1]
-    for i in range(y_max, y_min, -50):
-        canv.create_line(0, i, 960, i)
-        for j in range(len(point_list) - 1):
-            x, y = transection(0, i, 960, i, point_list[j][0], point_list[j][1], point_list[j + 1][0], point_list[j + 1][1])
-            x = round(x, 0)
-            y = round(y, 0)
-            x = int(x)
-            y = int(x)
-            cross_list.append([x, y])
-    print('cross_line: ', cross_list)
-        
-    #print('a: ', a)
-
-def transection(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2):
-    v1 = (bx2 - bx1) * (ay1 - by1) - (by2 - by1) * (ax1 - bx1)
-    v2 = (bx2 - bx1) * (ay2 - by1) - (by2 - by1) * (ax2 - bx1)
-    v3 = (ax2 - ax1) * (by1 - ay1) - (ay2 - ay1) * (bx1 - ax1)
-    v4 = (ax2 - ax1) * (by2 - ay1) - (ay2 - ay1) * (bx2 - ax1)
-    if ((v1 * v2 <= 0) and (v3 * v4 <= 0)):
-        flag = True
-        x, y = cross_line(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)
-        return x, y
-    else:
-        return -1, -1
-
-def cross_line(x1, y1, x2, y2, x3, y3, x4, y4):
-    dx1 = x2 - x1
-    dy1 = y2 - y1
-    dx2 = x4 - x3
-    dy2 = y4 - y3
-    x = dy1 * dx2 - dy2 * dx1
-
-    y = x3 * y4 - y3 * x4
-    x = ((x1 * y2 - y1 * x2) * dx2 - y * dx1) / x
-    y = (dy2 * x - y) / dx2
-    #return ((x1 <= x && x2 >= x) || (x2 <= x && x1 >= x)) && ((x3 <= x && x4 >= x) || (x4 <= x && x3 >= x))
-    return x, y
-
 if __name__ == '__main__':
     main()
 
 root.mainloop()
+
