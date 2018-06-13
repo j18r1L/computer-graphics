@@ -159,19 +159,49 @@ def line(x1, y1, x2, y2):
     canv.create_line(x1, y1, x2, y2)
 
 
-def get_PD(root):
-    global lines_check, img
+def get_PD(root1):
+    global lines_check, edges, exterm
+    for i in range(len(edges)):
+        for j in range(len(edges[i]) - 1, -1, -1):
+            if (j + 1 > len(edges[i]) - 1):
+                y0 = edges[i][0][1]
+                x0 = edges[i][0][0]
+            else:
+                y0 = edges[i][j + 1][1]
+                x0 = edges[i][j + 1][0]
+            fill_exterm(edges[i][j][0], edges[i][j][1], edges[i][j - 1][0], edges[i][j - 1][1], y0)
+    for i in range(len(edges)):
+        for j in range(len(edges[i]) - 1, -1, -1):
+            x1 = edges[i][j][0]
+            y1 = edges[i][j][1]
+            x2 = edges[i][j - 1][0]
+            y2 = edges[i][j - 1][1]
+            if (j + 1 > len(edges[i]) - 1):
+                y0 = edges[i][0][1]
+                x0 = edges[i][0][0]
+            else:
+                y0 = edges[i][j + 1][1]
+                x0 = edges[i][j + 1][0]
+            CDA(x1, y1, x2, y2, y0)
     lines_check = sort()
     for i in range(len(lines_check)):
         for j in range(0, len(lines_check[i]) - 1, 2):
-            for k in range(lines_check[i][j][0], lines_check[i][j + 1][0]):
+            #time.sleep(0.01)
+            #canv.after(1000, line(lines_check[i][j][0], lines_check[i][j][1], lines_check[i][j + 1][0], lines_check[i][j][1]))
+            #root.after(100, )
+            #paint(lines_check[i][j][0], lines_check[i][j][1], lines_check[i][j + 1][0], lines_check[i][j][1], 0)
+            canv.create_line(lines_check[i][j][0], lines_check[i][j][1], lines_check[i][j + 1][0], lines_check[i][j][1])
+            #canv.update()
+            root.update()
+            update_clock(0)
 
-                start = lines_check[i][j][0]
-                end = lines_check[i][j + 1][0]
-                if (k > start and k < end):
-                    canv.after(100, lambda: canv.create_image((1250//2, 700//2), image=img, state="normal"))
-                    img.put("black", (k, lines_check[i][j][1]))
-                    root.update()
+'''
+def paint(x1, y1, x2, y2, i):
+    canv.create_line(x1, y1, x2, y2)
+    i += 1
+    if i < 2:
+        root.after(500, paint(x1, y1, x2, y2, i))
+'''
 
 def sort():
     global lines_check
@@ -252,6 +282,11 @@ def get_E(root):
     y_start = False
     x_end = False
     y_end = False
+
+def update_clock(i):
+    i += 1
+    if i < 2:
+        root.after(1, update_clock(i))
 
 if __name__ == '__main__':
     main()
