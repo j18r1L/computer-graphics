@@ -19,7 +19,7 @@ def main():
     add_circle_button()
     delete_all_button()
     color_lines_button()
-    color_background_button()
+    #color_background_button()
     list()
     #create_lab()
     list_change_button()
@@ -61,7 +61,7 @@ def get_AL(root):
     x2 = int(x2)
     y2 = int(y2)
     
-    print(point_list)
+    #print(point_list)
     #point_list.append([x1, y1, x2, y2])
     if (method == "Станадртная библиотека"):
         canv.create_line(x1, y1, x2, y2, fill = color_lines[1])
@@ -86,9 +86,9 @@ def add_circle_button():
     add_r = Entry(root)
     add_r.pack()
     add_r.place(x = 980, y = 230, width = 50)
-    add_a = Entry(root)
-    add_a.pack()
-    add_a.place(x = 980, y = 280, width = 50)
+    #add_a = Entry(root)
+    #add_a.pack()
+    #add_a.place(x = 980, y = 280, width = 50)
     
     button_2 = Button(root,text=u"Нарисовать круг")
     button_2.pack()
@@ -110,15 +110,18 @@ def draw_point():
             brez_float(point_list[i][0], point_list[i][1], point_list[i][2], point_list[i][3])
 
 def get_AC(root):
-    global add_r, add_a, point_list
+    global add_r, point_list#, add_a
     radius = add_r.get()
-    angle = add_a.get()
+    #angle = add_a.get()
     radius = int(radius)
-    angle = int(angle)
-    rotate(angle, radius)
+    #angle = int(angle)
+    #rotate(angle, radius)
+    rotate(radius)
 
-def rotate(angle, r):
+#def rotate(angle, r):
+def rotate(r):
     global method, color_lines
+    angle = 30
     x_c = 500
     y_c = 500
     x1 = x_c - r 
@@ -131,8 +134,8 @@ def rotate(angle, r):
     y1c = y1
     y2c = y2
     for i in range(0, 360, angle):
-        print(i/angle)
-        print(i)
+        #print(i/angle)
+        #print(i)
         angle_rotate = i * math.pi / 180
         x_1 = x_c + (x1 - x_c) * math.cos(angle_rotate) + (y1 - y_c) * math.sin(angle_rotate)
         y_1 = y_c - (x1 - x_c) * math.sin(angle_rotate) + (y1 - y_c) * math.cos(angle_rotate)
@@ -236,7 +239,7 @@ def route():
     canv.create_text(970, 194, text = 'x: ')
     canv.create_text(1045, 194, text = 'y: ')
     canv.create_text(1010, 217, text = "Радиус: ")
-    canv.create_text(1000, 267, text = "Угол: ")
+    #canv.create_text(1000, 267, text = "Угол: ")
     #Линии меню
     canv.create_line(1000, 207.5, 1200, 207.5)
     canv.create_line(1000, 309, 1200, 309)
@@ -250,7 +253,7 @@ def list_change_button():
 def get_L(root):
 	global method, listbox
 	method = listbox.get(ACTIVE)
-	print(method)
+	#print(method)
 
 def list():
     global listbox
@@ -440,7 +443,7 @@ def change_lightness(color, lvl, max_levels):
     if (color == 'black'):
         color = '#000000'
     rrggbb = color[1:3], color[3:5], color[5:7]
-    print(rrggbb)
+    #print(rrggbb)
     rrggbb = [int(i, 16) for i in rrggbb]
     step = int(255/max_levels-1)
     for i in range(3):
